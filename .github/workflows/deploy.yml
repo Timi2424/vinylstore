@@ -1,0 +1,41 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test:cov
+
+      - name: Build application
+        run: npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          echo "machine api.heroku.com" >> ~/.netrc
+          echo "  login ${{ secrets.HEROKU_EMAIL }}" >> ~/.netrc
+          echo "  password ${{ secrets.HEROKU_API_KEY }}" >> ~/.netrc
+          git push https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git main
