@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Run tests
-        run: npm test:cov
+        run: npm run test:cov
 
       - name: Build application
         run: npm run build
