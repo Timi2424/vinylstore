@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
+import { JwtAuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -12,11 +13,11 @@ export class AuthController {
   ) {}
 
   @Get('login')
-  @UseGuards(AuthGuard('auth0'))
+  @UseGuards(JwtAuthGuard)
   login() {}
 
   @Get('callback')
-  @UseGuards(AuthGuard('auth0'))
+  @UseGuards(JwtAuthGuard)
   async callback(@Req() req: Request, @Res() res: Response) {
     const user = req.user;
     const token = await this.authService.generateJwtToken(user);
