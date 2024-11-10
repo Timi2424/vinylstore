@@ -11,6 +11,7 @@ export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
       clientID: configService.get<string>('AUTH0_CLIENT_ID'),
       clientSecret: configService.get<string>('AUTH0_CLIENT_SECRET'),
       callbackURL: configService.get<string>('AUTH0_CALLBACK_URL'),
+      state: false
     });
   }
 
