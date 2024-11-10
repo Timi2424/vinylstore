@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { VinylRecord } from 'src/model/record.model';
-import { Review } from 'src/model/review.model';
-import { User } from 'src/model/user.model';
+import { VinylRecord } from '../model/record.model';
+import { Review } from '../model/review.model';
+import { User } from '../model/user.model';
 
 @Injectable()
 export class VinylService {
