@@ -4,8 +4,8 @@ import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
-import logger from 'src/utils/logger';
-import { User } from 'src/types/user.type';
+import logger from '../utils/logger';
+import { User } from '../types/user.type';
 
 @ApiTags('Authentication')
 @Controller('auth')
