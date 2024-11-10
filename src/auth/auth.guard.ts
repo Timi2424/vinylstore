@@ -20,7 +20,7 @@ export class JwtAuthGuard implements CanActivate {
             request['user'] = decoded;
             return true;
         } catch (error) {
-            logger.log(error);
+            logger.log(error);  
             return false;
         }
     }

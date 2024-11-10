@@ -1,31 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-auth0';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { passportJwtSecret } from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
-    constructor(configService: ConfigService) {
-        super({
-            domain: configService.get<string>('AUTH0_DOMAIN'),
-            clientID: configService.get<string>('AUTH0_CLIENT_ID'),
-            clientSecret: configService.get<string>('AUTH0_CLIENT_SECRET'),
-            callbackURL: configService.get<string>('AUTH0_CALLBACK_URL'),
-            scope: 'openid profile email',
-        });
-    }
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(configService: ConfigService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      audience: configService.get<string>('AUTH0_AUDIENCE'),
+      issuer: `https://${configService.get<string>('AUTH0_DOMAIN')}/`,
+      algorithms: ['RS256'],
+      secretOrKeyProvider: passportJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `https://${configService.get<string>('AUTH0_DOMAIN')}/.well-known/jwks.json`,
+      }),
+    });
+  }
 
-    async validate(
-        accessToken: string,
-        refreshToken: string,
-        extraParams: any,
-        profile: any,
-    ): Promise<any> {
-        const { id, displayName, emails } = profile;
-        return {
-            id,
-            name: displayName,
-            email: emails[0].value,
-        };
-    }
+  async validate(payload: any) {
+    return { userId: payload.sub, email: payload.email };
+  }
 }
