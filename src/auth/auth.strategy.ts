@@ -1,27 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { passportJwtSecret } from 'jwks-rsa';
+import { Strategy } from 'passport-auth0';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
   constructor(configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      audience: configService.get<string>('AUTH0_AUDIENCE'),
-      issuer: `https://${configService.get<string>('AUTH0_DOMAIN')}/`,
-      algorithms: ['RS256'],
-      secretOrKeyProvider: passportJwtSecret({
-        cache: true,
-        rateLimit: true,
-        jwksRequestsPerMinute: 5,
-        jwksUri: `https://${configService.get<string>('AUTH0_DOMAIN')}/.well-known/jwks.json`,
-      }),
+      domain: configService.get<string>('AUTH0_DOMAIN'),
+      clientID: configService.get<string>('AUTH0_CLIENT_ID'),
+      clientSecret: configService.get<string>('AUTH0_CLIENT_SECRET'),
+      callbackURL: configService.get<string>('AUTH0_CALLBACK_URL'),
     });
   }
 
-  async validate(payload: any) {
-    return { userId: payload.sub, email: payload.email };
+  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any, done: Function) {
+    try {
+      done(null, profile);
+    } catch (err) {
+      done(err, false);
+    }
   }
 }
