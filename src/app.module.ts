@@ -24,11 +24,6 @@ import { VinylModule } from './vinyl/vinyl.module';
     VinylModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+  providers: [],
 })
 export class AppModule {}
