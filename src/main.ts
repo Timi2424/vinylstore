@@ -28,7 +28,8 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api');
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('docs', app, document);
+    SwaggerModule.setup('docs', app, document, 
+        {useGlobalPrefix: true} );
 
     app.use(cookieParser());
     await app.listen(process.env.PORT || 3000);
