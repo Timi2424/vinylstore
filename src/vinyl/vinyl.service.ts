@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Vinyl } from '../model/vinyl.model.js';
 import { CreateVinylDto } from './dto/create-vinyl.dto.js';
 import { UpdateVinylDto } from './dto/update-vinyl.dto.js';
+import { Vinyl } from '../model/vinyl.model.js';
 
 @Injectable()
 export class VinylService {
