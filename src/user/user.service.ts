@@ -5,8 +5,8 @@ import {
   } from '@nestjs/common';
 
   import { UpdateUserDto } from './dto/update-user.dto';
-  import logger from 'src/utils/logger';
-import { User } from 'src/model/user.model';
+  import logger from '../utils/logger';
+import { User } from '../model/user.model';
   
   @Injectable()
   export class UserService {
