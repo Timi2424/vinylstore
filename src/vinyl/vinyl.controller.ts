@@ -3,16 +3,16 @@ import { VinylService } from './vinyl.service';
 import { CreateVinylDto } from './dto/create-vinyl.dto';
 import { UpdateVinylDto } from './dto/update-vinyl.dto';
 
-@Controller('vinyls')
+@Controller('vinyl')
 export class VinylController {
   constructor(private readonly vinylService: VinylService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() createVinylDto: CreateVinylDto) {
     return this.vinylService.create(createVinylDto);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.vinylService.findAll();
   }

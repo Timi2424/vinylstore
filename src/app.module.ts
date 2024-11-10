@@ -8,6 +8,7 @@ import { DatabaseModule } from './db/db.module';
 import { PaymentModule } from './payment/payment.module';
 import { EmailModule } from './email/email.module';
 import { JwtAuthGuard } from './auth/auth.guard';
+import { VinylModule } from './vinyl/vinyl.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtAuthGuard } from './auth/auth.guard';
     UserModule,
     PaymentModule,
     EmailModule,
+    VinylModule,
   ],
   controllers: [],
   providers: [
