@@ -1,41 +1,51 @@
 import {
     Controller,
     Get,
-    Put,
+    Patch,
     Delete,
     Body,
-    Req,
     UseGuards,
+    Req,
   } from '@nestjs/common';
+  import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
   import { UserService } from './user.service';
-  import { AuthGuard } from '@nestjs/passport';
+  import { UpdateUserDto } from './dto/update-user.dto';
   import { Request } from 'express';
-import { UpdateUserDto } from './dto/update-user.dto';
+  import { JwtAuthGuard } from '../auth/auth.guard';
   
-  @Controller('user')
-  @UseGuards(AuthGuard('jwt'))
+  @ApiTags('Users')
+  @Controller('users')
   export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly usersService: UserService) {}
   
+    @ApiOperation({ summary: 'Get user profile' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @Get('profile')
     async getProfile(@Req() req: Request) {
-      const userId = req.user['id'];
-      return this.userService.findOne(userId);
+      const userId = req.user['sub'];
+      return this.usersService.findById(userId);
     }
   
-    @Put('profile')
+    @ApiOperation({ summary: 'Update user profile' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Patch('profile')
     async updateProfile(
       @Req() req: Request,
       @Body() updateUserDto: UpdateUserDto,
     ) {
-      const userId = req.user['id'];
-      return this.userService.update(userId, updateUserDto);
+      const userId = req.user['sub'];
+      return this.usersService.update(userId, updateUserDto);
     }
   
+    @ApiOperation({ summary: 'Delete user profile' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @Delete('profile')
     async deleteProfile(@Req() req: Request) {
-      const userId = req.user['id'];
-      await this.userService.remove(userId);
+      const userId = req.user['sub'];
+      await this.usersService.remove(userId);
       return { message: 'User profile deleted successfully' };
     }
   }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import logger from 'src/utils/logger';
 
 @Injectable()
 export class AuthService {
@@ -7,7 +8,9 @@ export class AuthService {
 
   async generateJwtToken(user: any) {
     const payload = { sub: user.id, email: user.email, role: user.role };
-    return this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload);
+    logger.log(`Token generated for ${user.email}`);
+    return token;
   }
 
   async validateUser(payload: any) {

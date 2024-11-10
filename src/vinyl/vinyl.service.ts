@@ -1,46 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize-typescript';
-import { VinylRecord } from '../model/record.model';
-import { Review } from '../model/review.model';
-import { User } from '../model/user.model';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Vinyl } from '../model/vinyl.model.js';
+import { CreateVinylDto } from './dto/create-vinyl.dto.js';
+import { UpdateVinylDto } from './dto/update-vinyl.dto.js';
 
 @Injectable()
 export class VinylService {
-  constructor(
-    @InjectModel(VinylRecord)
-    private readonly vinylRecordModel: typeof VinylRecord,
-    private readonly sequelize: Sequelize,
-  ) {}
+  constructor() {}
 
-  async findAll(
-    page: number,
-    limit: number,
-  ): Promise<{ rows: VinylRecord[]; count: number }> {
-    const offset = (page - 1) * limit;
-    const { rows, count } = await this.vinylRecordModel.findAndCountAll({
-      include: [
-        {
-          model: Review,
-          include: [User],
-          limit: 1,
-          order: [['createdAt', 'ASC']],
-        },
-      ],
-      attributes: {
-        include: [
-          [
-            this.sequelize.fn('AVG', this.sequelize.col('reviews.rating')),
-            'averageRating',
-          ],
-        ],
-      },
-      group: ['VinylRecord.id', 'reviews.id', 'reviews->user.id'],
-      limit,
-      offset,
-      subQuery: false,
-    });
+  async create(createVinylDto: CreateVinylDto): Promise<Vinyl> {
+    return Vinyl.create(createVinylDto);
+  }
 
-    return { rows, count: count.length };
+  async findAll(): Promise<Vinyl[]> {
+    return Vinyl.findAll({ include: { all: true } });
+  }
+
+  async findOne(id: string): Promise<Vinyl> {
+    const vinyl = await Vinyl.findByPk(id, { include: { all: true } });
+    if (!vinyl) {
+      throw new NotFoundException(`Vinyl with id ${id} not found`);
+    }
+    return vinyl;
+  }
+
+  async update(id: string, updateVinylDto: UpdateVinylDto): Promise<Vinyl> {
+    const vinyl = await Vinyl.findByPk(id);
+    return vinyl.update(updateVinylDto);
+  }
+
+  async remove(id: string): Promise<void> {
+    const vinyl = await Vinyl.findByPk(id);
+    await vinyl.destroy();
   }
 }

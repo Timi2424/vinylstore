@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-auth0';
 import { ConfigService } from '@nestjs/config';
+import { User } from '../types/user.type';
 
 @Injectable()
 export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
@@ -11,13 +12,24 @@ export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
       clientID: configService.get<string>('AUTH0_CLIENT_ID'),
       clientSecret: configService.get<string>('AUTH0_CLIENT_SECRET'),
       callbackURL: configService.get<string>('AUTH0_CALLBACK_URL'),
-      state: false
+      state: false,
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any, done: Function) {
+  async validate(
+    accessToken: string,
+    refreshToken: string,
+    extraParams: any,
+    profile: any,
+    done: Function,
+  ) {
     try {
-      done(null, profile);
+      const user: User = {
+        id: profile.id,
+        email: profile.emails[0].value,
+        role: profile._json['https://your-app.com/roles'][0],
+      };
+      done(null, user);
     } catch (err) {
       done(err, false);
     }

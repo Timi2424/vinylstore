@@ -4,9 +4,7 @@ import cookieParser from 'cookie-parser';
 import { Sequelize } from 'sequelize';
 import logger from './utils/logger';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as dotenv from 'dotenv';
-
-dotenv.config({ path: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env' });
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -32,6 +30,7 @@ async function bootstrap() {
         {useGlobalPrefix: true} );
 
     app.use(cookieParser());
+    app.useGlobalFilters(new HttpExceptionFilter());
     await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

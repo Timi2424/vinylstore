@@ -1,25 +1,34 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { VinylService } from './vinyl.service';
+import { CreateVinylDto } from './dto/create-vinyl.dto';
+import { UpdateVinylDto } from './dto/update-vinyl.dto';
 
-
-@Controller('vinyl')
+@Controller('vinyls')
 export class VinylController {
-  constructor(private readonly vinylRecordService: VinylService) {}
+  constructor(private readonly vinylService: VinylService) {}
+
+  @Post()
+  create(@Body() createVinylDto: CreateVinylDto) {
+    return this.vinylService.create(createVinylDto);
+  }
 
   @Get()
-  async getVinylRecords(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ) {
-    const { rows, count } = await this.vinylRecordService.findAll(
-      Number(page),
-      Number(limit),
-    );
-    return {
-      data: rows,
-      total: count,
-      page: Number(page),
-      pageCount: Math.ceil(count / Number(limit)),
-    };
+  findAll() {
+    return this.vinylService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.vinylService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateVinylDto: UpdateVinylDto) {
+    return this.vinylService.update(id, updateVinylDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.vinylService.remove(id);
   }
 }

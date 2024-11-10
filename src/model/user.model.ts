@@ -1,41 +1,35 @@
-// user.model.ts
 import {
   Table,
   Column,
   Model,
   DataType,
-  HasMany,
+  PrimaryKey,
+  Default,
 } from 'sequelize-typescript';
-import { Review } from './review.model';
 
 @Table
 export class User extends Model<User> {
-  @Column({
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV4,
-    primaryKey: true,
-  })
+  @PrimaryKey
+  @Default(DataType.UUIDV4)
+  @Column(DataType.UUID)
   id: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
+  @Column(DataType.STRING)
   firstName: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
+  @Column(DataType.STRING)
   lastName: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    unique: true,
-  })
+  @Column(DataType.STRING)
   email: string;
 
-  @HasMany(() => Review)
-  reviews: Review[];
+  @Column(DataType.DATE)
+  birthdate: Date;
+
+  @Column(DataType.STRING)
+  avatar: string;
+
+  @Default('user')
+  @Column(DataType.STRING)
+  role: string;
 }

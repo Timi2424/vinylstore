@@ -1,5 +1,8 @@
 import { Sequelize } from 'sequelize-typescript';
 import { ConfigService } from '@nestjs/config';
+import { User } from '../model/user.model';
+import { Vinyl } from '../model/vinyl.model';
+import { Review } from '../model/review.model';
 
 const isDevEnv = process.env.NODE_ENV === 'development';
 
@@ -35,6 +38,8 @@ export const databaseProvider = [
                 logging: isDevEnv ? false : console.log,
             });
 
+            sequelize.addModels([User, Vinyl, Review]);
+            
             try {
                 await sequelize.sync({ force: isDevEnv });
             } catch (error) {
