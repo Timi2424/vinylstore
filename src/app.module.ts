@@ -3,6 +3,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './db/db.module';
+import { VinylModule } from './vinyl/vinyl.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { DatabaseModule } from './db/db.module';
             isGlobal: true,
         }),
         DatabaseModule,
+        VinylModule,
     ],
     controllers: [],
     providers: [],
