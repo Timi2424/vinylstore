@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-auth0';
 import { ConfigService } from '@nestjs/config';
-import { User } from '../types/user.type';
+import { UserType } from '../types/user.type';
 
 @Injectable()
 export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
@@ -24,8 +24,8 @@ export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
     done: Function,
   ) {
     try {
-      const user: User = {
-        id: profile.id,
+      const user: UserType = {
+        auth0Id: profile.id,
         email: profile.emails[0].value,
         role: profile._json['https://your-app.com/roles'][0],
       };

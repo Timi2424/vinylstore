@@ -5,7 +5,7 @@ import logger from '../utils/logger';
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
-
+  
   async generateJwtToken(user: any) {
     const payload = { sub: user.id, email: user.email, role: user.role };
     const token = this.jwtService.sign(payload);

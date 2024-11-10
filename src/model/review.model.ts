@@ -1,3 +1,4 @@
+// review.model.ts
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, Default, PrimaryKey } from 'sequelize-typescript';
 import { Vinyl } from './vinyl.model';
 import { User } from './user.model';
@@ -23,7 +24,7 @@ export class Review extends Model<Review> {
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.UUID,
+    type: DataType.STRING,
     allowNull: false,
   })
   userId: string;

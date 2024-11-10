@@ -1,11 +1,10 @@
-import { Table, Column, Model, DataType, PrimaryKey, Default } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey } from 'sequelize-typescript';
 
 @Table
 export class User extends Model<User> {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
-  @Column(DataType.UUID)
-  id: string;
+  @Column(DataType.STRING)
+  auth0Id: string;
 
   @Column(DataType.STRING)
   firstName: string;
@@ -22,7 +21,9 @@ export class User extends Model<User> {
   @Column(DataType.STRING)
   avatar: string;
 
-  @Default('user')
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    defaultValue: 'user',
+  })
   role: string;
 }

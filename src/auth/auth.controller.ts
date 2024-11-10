@@ -3,14 +3,16 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-
+import { UserService } from '../user/user.service';
 import logger from '../utils/logger';
-import { User } from '../types/user.type';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @ApiOperation({ summary: 'Login via Auth0' })
   @Get('login')
@@ -21,7 +23,22 @@ export class AuthController {
   @Get('callback')
   @UseGuards(AuthGuard('auth0'))
   async callback(@Req() req: Request, @Res() res: Response) {
-    const user = req.user as User;
+    const auth0User = req.user as any;
+    const auth0Id = auth0User.sub;
+    const email = auth0User.email;
+
+    let user = await this.userService.findByAuth0Id(auth0Id);
+    if (!user) {
+      user = await this.userService.create({
+        auth0Id,
+        email,
+        firstName: auth0User.given_name,
+        lastName: auth0User.family_name,
+        avatar: auth0User.picture,
+      });
+      logger.log(`Created new user with email ${email}`);
+    }
+
     const token = await this.authService.generateJwtToken(user);
 
     res.cookie('jwt', token, {
@@ -30,8 +47,8 @@ export class AuthController {
       maxAge: 3600000,
     });
 
-    logger.log(`User ${user.email} logged in`);
-    res.redirect('/profile');
+    logger.log(`User ${email} logged in`);
+    res.redirect('/api/user/profile');
   }
 
   @ApiOperation({ summary: 'Logout from the system' })
@@ -39,6 +56,6 @@ export class AuthController {
   async logout(@Res() res: Response) {
     res.clearCookie('jwt');
     logger.log('User logged out');
-    res.redirect('/');
+    res.redirect('/api/login');
   }
 }
