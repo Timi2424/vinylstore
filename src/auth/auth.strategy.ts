@@ -11,7 +11,8 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
       clientID: process.env.AUTH0_CLIENT_ID,
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       callbackURL: process.env.AUTH0_CALLBACK_URL,
-      state: false
+      state: false,
+      scope: 'openid profile email',
     });
   }
 
