@@ -2,11 +2,12 @@ import { Controller, Get, Delete, HttpException, HttpStatus, UseGuards } from '@
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { AdminGuard } from '../auth/admin.guard';
-import { JwtAuthGuard } from '../auth/auth.guard';
+import { SessionAuthGuard } from '../auth/auth.guard';
+
 
 @ApiTags('Admin')
 @Controller('admin')
-@UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(SessionAuthGuard, AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 

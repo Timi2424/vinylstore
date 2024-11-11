@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
-import { JwtAuthGuard } from '../auth/auth.guard';
+import { SessionAuthGuard } from '../auth/auth.guard';
 
 @ApiTags('User')
 @Controller('user')
@@ -11,7 +11,7 @@ export class UserController {
   constructor(private readonly usersService: UserService) {}
 
   @ApiOperation({ summary: 'Get user profile' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SessionAuthGuard)
   @Get('profile')
   async getProfile(@Req() req: Request) {
     try {
@@ -24,7 +24,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Update user profile' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SessionAuthGuard)
   @Patch('profile')
   async updateProfile(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     try {
@@ -37,7 +37,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Delete user profile' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SessionAuthGuard)
   @Delete('profile')
   async deleteProfile(@Req() req: Request) {
     try {
