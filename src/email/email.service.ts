@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-import logger from '../utils/logger';
+import { systemLogger } from '../utils/logger';
+
 
 @Injectable()
 export class EmailService {
@@ -22,9 +23,9 @@ export class EmailService {
 
     this.transporter.verify((error, success) => {
       if (error) {
-        logger.error('Email service initialization error:', error);
+        systemLogger.error('Email service initialization error:', error);
       } else {
-        logger.log('Email service initialized successfully');
+        systemLogger.log('Email service initialized successfully');
       }
     });
   }
@@ -38,11 +39,11 @@ export class EmailService {
     };
 
     try {
-      logger.log(`Sending email to ${user.email}...`);
+      systemLogger.log(`Sending email to ${user.email}...`);
       const info = await this.transporter.sendMail(mailOptions);
-      logger.log(`Email sent: ${info.response}`);
+      systemLogger.log(`Email sent: ${info.response}`);
     } catch (error) {
-      logger.error(`Failed to send email: ${(error as Error).message}`);
+      systemLogger.error(`Failed to send email: ${(error as Error).message}`);
     }
   }
 }

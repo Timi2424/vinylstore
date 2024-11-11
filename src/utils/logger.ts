@@ -4,25 +4,29 @@ import * as path from 'path';
 
 const { combine, timestamp, printf, errors } = winston.format;
 
-const logFilePath = path.join(process.cwd(), 'logs', 'combined.log');
+const systemLogPath = path.join(process.cwd(), 'logs', 'system.log');
+const controllerLogPath = path.join(process.cwd(), 'logs', 'controller.log');
 
-const logger = WinstonModule.createLogger({
+export const systemLogger = WinstonModule.createLogger({
     level: 'info',
     format: combine(
         timestamp(),
         errors({ stack: true }),
-        printf(({ timestamp, level, message }) => {
-            return `${timestamp} ${level}: ${message}`;
-        }),
+        printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
     ),
     transports: [
         new winston.transports.Console(),
-        new winston.transports.File({ filename: logFilePath }),
+        new winston.transports.File({ filename: systemLogPath }),
     ],
 });
 
-logger.log('error', (error) => {
-    console.error('Logger error:', error);
+export const controllerLogger = WinstonModule.createLogger({
+    level: 'http',
+    format: combine(
+        timestamp(),
+        printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
+    ),
+    transports: [
+        new winston.transports.File({ filename: controllerLogPath }),
+    ],
 });
-
-export default logger;

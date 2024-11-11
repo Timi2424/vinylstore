@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from '../user/user.service';
-import logger from '../utils/logger';
+import { systemLogger } from '../utils/logger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -18,7 +18,7 @@ export class AuthController {
   @Get('login')
   @UseGuards(AuthGuard('auth0'))
   login() {
-    logger.log('Redirecting to Auth0 for login');
+    systemLogger.log('Redirecting to Auth0 for login');
   }
 
   @ApiOperation({ summary: 'Auth0 callback' })
@@ -39,9 +39,9 @@ export class AuthController {
           lastName: auth0User.family_name,
           avatar: auth0User.picture,
         });
-        logger.log(`Created new user with email ${email}`);
+        systemLogger.log(`Created new user with email ${email}`);
       } else {
-        logger.log(`User ${email} authenticated via Auth0`);
+        systemLogger.log(`User ${email} authenticated via Auth0`);
       }
 
       const token = await this.authService.generateJwtToken(user);
@@ -52,10 +52,10 @@ export class AuthController {
         maxAge: 3600000,
       });
 
-      logger.log(`JWT token generated for ${email}`);
+      systemLogger.log(`JWT token generated for ${email}`);
       res.redirect('/api/user/profile');
     } catch (error) {
-      logger.error(`Auth0 callback error: ${error.message}`, { error });
+      systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
       throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -65,10 +65,10 @@ export class AuthController {
   async logout(@Res() res: Response) {
     try {
       res.clearCookie('jwt');
-      logger.log('User logged out and JWT cookie cleared');
+      systemLogger.log('User logged out and JWT cookie cleared');
       res.redirect('/api/login');
     } catch (error) {
-      logger.error(`Logout error: ${error.message}`, { error });
+      systemLogger.error(`Logout error: ${error.message}`, { error });
       throw new HttpException('Failed to log out', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

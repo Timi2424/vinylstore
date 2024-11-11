@@ -6,6 +6,7 @@ import { DatabaseModule } from './db/db.module';
 import { PaymentModule } from './payment/payment.module';
 import { EmailModule } from './email/email.module';
 import { VinylModule } from './vinyl/vinyl.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { VinylModule } from './vinyl/vinyl.module';
     PaymentModule,
     EmailModule,
     VinylModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [],

@@ -6,7 +6,8 @@ import {
     HttpStatus,
   } from '@nestjs/common';
   import { Request, Response } from 'express';
-  import logger from 'src/utils/logger';
+import { systemLogger } from 'src/utils/logger';
+
   
   @Catch()
   export class HttpExceptionFilter implements ExceptionFilter {
@@ -25,7 +26,7 @@ import {
           ? exception.getResponse()
           : 'Internal server error';
   
-      logger.error(
+      systemLogger.log(
         `HTTP Status: ${status} Error Message: ${JSON.stringify(message)}`,
       );
   

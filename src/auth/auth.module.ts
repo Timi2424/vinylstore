@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { Auth0Strategy } from './auth.strategy';
 import { UserModule } from '../user/user.module';
+import { AdminGuard } from './admin.guard';
+import { JwtAuthGuard } from './auth.guard';
 
 @Module({
   imports: [
@@ -21,8 +23,8 @@ import { UserModule } from '../user/user.module';
     }),
     forwardRef(() => UserModule),
   ],
-  providers: [AuthService, Auth0Strategy],
+  providers: [AuthService, Auth0Strategy, AdminGuard, JwtAuthGuard],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, AdminGuard, JwtAuthGuard],
 })
 export class AuthModule {}

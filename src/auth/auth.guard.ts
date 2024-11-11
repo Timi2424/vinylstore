@@ -5,7 +5,8 @@ import {
   } from '@nestjs/common';
   import { JwtService } from '@nestjs/jwt';
   import { Request } from 'express';
-  import logger from '../utils/logger';
+import { systemLogger } from '../utils/logger';
+
   
   @Injectable()
   export class JwtAuthGuard implements CanActivate {
@@ -16,17 +17,17 @@ import {
       const token = request.cookies['jwt'];
   
       if (!token) {
-        logger.warn('JWT token not found');
+        systemLogger.warn('JWT token not found');
         return false;
       }
   
       try {
         const decoded = this.jwtService.verify(token);
         request['user'] = decoded;
-        logger.log(`JWT token verified for ${decoded.email}`);
+        systemLogger.log(`JWT token verified for ${decoded.email}`);
         return true;
       } catch (error) {
-        logger.error('Token verification failed', error);
+        systemLogger.error('Token verification failed', error);
         return false;
       }
     }
