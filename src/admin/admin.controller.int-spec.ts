@@ -5,7 +5,7 @@ import { AppModule } from '../app.module';
 import { AdminService } from './admin.service';
 
 
-describe('AdminController (e2e)', () => {
+describe('AdminController (integration)', () => {
   let app: INestApplication;
   let adminService = { readSystemLogs: jest.fn(), deleteSystemLogs: jest.fn(), readControllerLogs: jest.fn(), deleteControllerLogs: jest.fn() };
 

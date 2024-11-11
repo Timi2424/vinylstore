@@ -1,85 +1,49 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Vinyl Store Application
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Welcome to the Vinyl Store Application, a full-featured NestJS application that allows users to explore and purchase vinyl records, leave reviews, and manage their profiles. Admin users have additional capabilities to manage records, view system logs, and more. This project uses powerful tools like Auth0 for authentication, Stripe for payment processing, and a PostgreSQL database to handle persistent data storage.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Acknowledgments
 
-## Description
+A huge thank you to the LeverX team for the incredible opportunity to develop this application using NestJS. This project has been an invaluable learning experience in building a modern, secure, and scalable application with best practices in mind. I am grateful for the chance to explore these advanced concepts in a real-world setting.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Project setup
+- **User Authentication**: Secure login via Auth0.
+- **Profile Management**: Users can view, edit, and delete their profiles.
+- **Vinyl Record Management**: Explore vinyl records, add reviews, and make purchases.
+- **Admin Capabilities**: Admins can manage records, view logs, and moderate reviews.
+- **Payment Processing**: Integrates with Stripe for secure payments.
+- **Full API Documentation**: Explore all available routes and endpoints at `/api/docs`.
 
-```bash
-$ npm install
-```
+## Technologies Used
 
-## Compile and run the project
+- **NestJS**: A progressive Node.js framework for building efficient, reliable, and scalable server-side applications.
+- **Auth0**: Handles secure user authentication.
+- **Stripe**: Powers the payment processing for vinyl purchases.
+- **PostgreSQL**: Database management system for data persistence.
+- **Swagger**: Full API documentation available at `/api/docs`.
 
-```bash
-# development
-$ npm run start
+## Setup Instructions
 
-# watch mode
-$ npm run start:dev
+### Prerequisites
 
-# production mode
-$ npm run start:prod
-```
+- **Node.js**: Ensure you have Node.js installed (v14.x or higher recommended).
+- **PostgreSQL**: Set up a PostgreSQL database and configure it with the application.
 
-## Run tests
+### Installation
 
-```bash
-# unit tests
-$ npm run test
+1. **Clone the repository**:
+  git clone https/ssh
+  cd exam
+2. **Install dependencies**:
+  npm install
+3. **Environment Configuration**:
+  Create a .env file in the root directory of your project.
+  Copy the variables from env.example and fill in the necessary credentials for Auth0, PostgreSQL, email, and Stripe configurations.
+4. **Running the Application**:
+  npm run start:dev
+5. **Accessing API Documentation**:
+  npm run test
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
-```
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
--   Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
--   For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
--   To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
--   Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
--   Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
--   To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
--   Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
--   Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
--   Website - [https://nestjs.com](https://nestjs.com/)
--   Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Thank you once again, LeverX team, for the chance to develop this project with NestJS. It has been a fantastic journey filled with learning and growth.
