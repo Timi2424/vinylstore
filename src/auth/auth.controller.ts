@@ -48,7 +48,7 @@ export class AuthController {
     });
 
     logger.log(`User ${email} logged in`);
-    res.redirect('/api/user/profile');
+    res.redirect('/api/auth/callback');
   }
 
   @ApiOperation({ summary: 'Logout from the system' })
@@ -56,6 +56,6 @@ export class AuthController {
   async logout(@Res() res: Response) {
     res.clearCookie('jwt');
     logger.log('User logged out');
-    res.redirect('/api/login');
+    res.redirect('/api/auth/login');
   }
 }
