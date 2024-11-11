@@ -1,7 +1,6 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { systemLogger } from '../utils/logger';
-
 
 @Injectable()
 export class AuthService {
@@ -9,23 +8,28 @@ export class AuthService {
 
   async generateJwtToken(user: any) {
     try {
-      const payload = { sub: user.auth0Id, email: user.email, role: user.role };
+      const payload = { sub: user.auth0Id, email: user.email, role: user.role || 'user' };
+      systemLogger.log(`Generating JWT with payload: ${JSON.stringify(payload)}`);
+      
       const token = this.jwtService.sign(payload);
-      systemLogger.log(`JWT token generated for ${user.email}`);
+      systemLogger.log(`Generated JWT: ${token}`);
+      
       return token;
     } catch (error) {
-      systemLogger.error(`Failed to generate JWT token for ${user.email}`, { error });
-      throw new HttpException('Token generation failed', HttpStatus.INTERNAL_SERVER_ERROR);
+      systemLogger.error(`JWT generation error: ${error.message}`);
+      throw error;
     }
   }
 
-  async validateUser(payload: any) {
-    if (!payload || !payload.sub) {
-      systemLogger.warn('Invalid JWT payload for validation');
-      throw new HttpException('Invalid token payload', HttpStatus.UNAUTHORIZED);
+  async validateUser(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+      systemLogger.log(`Validating JWT: ${JSON.stringify(decoded)}`);
+      
+      return decoded;
+    } catch (error) {
+      systemLogger.warn(`Invalid JWT payload for validation: ${error.message}`);
+      throw error;
     }
-
-    systemLogger.log(`Validating user with email ${payload.email}`);
-    return { id: payload.sub, email: payload.email, role: payload.role };
   }
 }
