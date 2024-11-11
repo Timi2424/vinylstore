@@ -30,8 +30,8 @@ async callback(@Req() req: Request, @Res() res: Response) {
         
         const auth0User = req.user as any;
         if (!auth0User) {
-            systemLogger.error('User information is missing from Auth0');
-            throw new Error("User information is missing from Auth0");
+          systemLogger.error('User information missing in Auth0 callback');
+          throw new HttpException('Auth0 user information missing', HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         systemLogger.log(`Auth0 user data received: ${JSON.stringify(auth0User)}`);
@@ -54,7 +54,11 @@ async callback(@Req() req: Request, @Res() res: Response) {
             systemLogger.log(`User ${email} authenticated via Auth0`);
         }
 
-        const token = await this.authService.generateJwtToken(user);
+        const token = await this.authService.generateJwtToken(auth0User);
+            if (!token) {
+              systemLogger.error('Failed to generate JWT token');
+              throw new HttpException('Token generation failed', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         res.cookie('jwt', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -62,7 +66,7 @@ async callback(@Req() req: Request, @Res() res: Response) {
         });
 
         systemLogger.log(`JWT token generated and cookie set for ${email}`);
-        res.redirect('/api/auth/callback');
+        res.redirect('/api/user/profile');
     } catch (error) {
         systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
         throw new HttpException('Callback Error', HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { systemLogger } from '../utils/logger';
 
 @Injectable()
@@ -21,15 +21,19 @@ export class AuthService {
     }
   }
 
-  async validateUser(token: string) {
+  async validateUser(token: any) {
+    if (!token || typeof token !== 'string') {
+      systemLogger.warn('Invalid token type or missing token');
+      throw new JsonWebTokenError('JWT must be a string');
+    }
+  
     try {
       const decoded = this.jwtService.verify(token);
-      systemLogger.log(`Validating JWT: ${JSON.stringify(decoded)}`);
-      
+      systemLogger.log(`JWT successfully verified: ${JSON.stringify(decoded)}`);
       return decoded;
     } catch (error) {
-      systemLogger.warn(`Invalid JWT payload for validation: ${error.message}`);
-      throw error;
+      systemLogger.error(`Token verification error: ${error.message}`, { error });
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
   }
 }
