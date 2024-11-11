@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, HttpStatus } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from 'src/app.module';
+import { AppModule } from '../app.module';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewService } from './review.service';
 
 
-describe('ReviewController (e2e)', () => {
+describe('ReviewController (integration)', () => {
   let app: INestApplication;
   let reviewService = { createReview: jest.fn(), getReviewsByVinylId: jest.fn(), deleteReview: jest.fn() };
 

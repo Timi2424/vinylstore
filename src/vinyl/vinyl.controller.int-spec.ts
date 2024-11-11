@@ -6,7 +6,7 @@ import { CreateVinylDto } from './dto/create-vinyl.dto';
 import { VinylService } from './vinyl.service';
 
 
-describe('VinylController (e2e)', () => {
+describe('VinylController (integration)', () => {
   let app: INestApplication;
   let vinylService = { create: jest.fn(), findAll: jest.fn(), findOne: jest.fn(), update: jest.fn(), remove: jest.fn() };
 

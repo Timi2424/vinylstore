@@ -5,7 +5,7 @@ import { AppModule } from '../app.module';
 import { PaymentService } from './payment.service';
 
 
-describe('PaymentController (e2e)', () => {
+describe('PaymentController (integration)', () => {
   let app: INestApplication;
   let paymentService = { createPaymentIntent: jest.fn() };
 

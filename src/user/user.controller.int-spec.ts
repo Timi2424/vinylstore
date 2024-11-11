@@ -5,7 +5,7 @@ import { AppModule } from '../app.module';
 import { UserService } from './user.service';
 
 
-describe('UserController (e2e)', () => {
+describe('UserController (integration)', () => {
   let app: INestApplication;
   let userService = { findByAuth0Id: jest.fn(), create: jest.fn(), updateByAuth0Id: jest.fn(), removeByAuth0Id: jest.fn() };
 
