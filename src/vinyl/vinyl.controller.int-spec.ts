@@ -24,7 +24,7 @@ describe('VinylController (integration)', () => {
 
   afterAll(async () => {
     await app.close();
-  });
+  }); 
 
   it('POST /vinyl/create', () => {
     const dto: CreateVinylDto = { name: 'Test Vinyl', artist: 'Test Artist', description: 'A test vinyl', price: 29.99 };

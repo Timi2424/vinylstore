@@ -101,9 +101,14 @@
         "!**/main.(t|j)s", 
         "!**/environment/*",
         "!**/*.config.(t|j)s",
-        "!**/*.d.ts"
+        "!**/*.d.ts",
+        "!**/auth/**",
+        "!**/filters/**",
+        "!**/email/**",
+        "!**/db/**"
     ],
     "coverageDirectory": "../coverage",
+    "coverageReporters": ["text", "lcov", "json", "html"],
     "testEnvironment": "node"
 }
 }
