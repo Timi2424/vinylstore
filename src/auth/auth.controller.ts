@@ -65,10 +65,9 @@ async callback(@Req() req: Request, @Res() res: Response) {
         res.redirect('/api/auth/callback');
     } catch (error) {
         systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
-        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException('Callback Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-
 
   @ApiOperation({ summary: 'Logout from the system' })
   @Get('logout')
