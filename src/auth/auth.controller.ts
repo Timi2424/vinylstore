@@ -60,6 +60,11 @@ async callback(@Req() req: Request, @Res() res: Response) {
               throw new HttpException('Token generation failed', HttpStatus.INTERNAL_SERVER_ERROR);
             }
           systemLogger.log(`Generated JWT token: ${token}`);
+          console.log(token)
+          console.log(token)
+          console.log(token)
+          console.log(token)
+          
         res.cookie('jwt', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
