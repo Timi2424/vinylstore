@@ -1,81 +1,45 @@
-import { Controller, Get, Req, Res, UseGuards, HttpStatus, HttpException } from '@nestjs/common';
+// src/auth/auth.controller.ts
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { UserService } from '../user/user.service';
-import { systemLogger } from '../utils/logger';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: 'Login via Auth0' })
   @Get('login')
   @UseGuards(AuthGuard('auth0'))
   login() {
-    systemLogger.log('Initiating Auth0 login redirect');
+    // Auth0 handles redirect, no additional logic needed here
   }
 
   @ApiOperation({ summary: 'Auth0 callback' })
   @Get('callback')
   @UseGuards(AuthGuard('auth0'))
   async callback(@Req() req: Request, @Res() res: Response) {
-    try {
-      const auth0User = req.user as any;
+    // Extract basic user details
+    const user = req.user as any;
+    const token = this.authService.generateJwtToken(user);
 
-      if (!auth0User || !auth0User.sub) {
-        systemLogger.error('Auth0 callback failed: Missing user information from Auth0.');
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
+    // Set JWT as an HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3600000,
+    });
 
-      const auth0Id = auth0User.sub;
-      const email = auth0User.email || 'No email provided';
-      systemLogger.log(`Auth0 user authenticated: ${auth0Id}, ${email}`);
-
-      let user = await this.userService.findByAuth0Id(auth0Id);
-      if (!user) {
-        user = await this.userService.create({
-          auth0Id,
-          email,
-          firstName: auth0User.given_name || 'First name missing',
-          lastName: auth0User.family_name || 'Last name missing',
-          avatar: auth0User.picture || '',
-        });
-        systemLogger.log(`Created new user record for ${email} (Auth0 ID: ${auth0Id})`);
-      } else {
-        systemLogger.log(`Existing user record found for ${email} (Auth0 ID: ${auth0Id})`);
-      }
-
-      const token = await this.authService.generateJwtToken(user);
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 3600000,
-      });
-
-      systemLogger.log(`JWT token issued for user ${email} (Auth0 ID: ${auth0Id})`);
-      res.redirect('/api/user/profile');
-    } catch (error) {
-      systemLogger.error(`Auth0 callback error: ${error.message}`, { errorStack: error.stack });
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    // Redirect after successful authentication
+    res.redirect('/api/user/profile');
   }
 
-  @ApiOperation({ summary: 'Logout from the system' })
+  @ApiOperation({ summary: 'Logout' })
   @Get('logout')
-  async logout(@Res() res: Response) {
-    try {
-      res.clearCookie('jwt');
-      systemLogger.log('User successfully logged out and JWT cookie cleared');
-      res.redirect('/api/login');
-    } catch (error) {
-      systemLogger.error(`Logout error: ${error.message}`, { errorStack: error.stack });
-      throw new HttpException('Failed to log out', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  logout(@Res() res: Response) {
+    res.clearCookie('jwt');
+    res.redirect('/api/login');
   }
 }
