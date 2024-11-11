@@ -39,22 +39,28 @@ export class VinylService {
 
       const vinyls = await Vinyl.findAndCountAll({
         where,
+        attributes: {
+          include: [
+            [
+              Sequelize.fn('AVG', Sequelize.col('reviews.rating')),
+              'averageScore'
+            ]
+          ]
+        },
         include: [
           {
             model: Review,
-            attributes: [
-              [Sequelize.fn('AVG', Sequelize.col('rating')), 'averageScore'],
-            ],
-            limit: 1,
+            attributes: [],
           },
         ],
+        group: ['Vinyl.id'],
         offset,
         limit: pageSize,
         order: [[sortBy, 'ASC']],
         distinct: true,
       });
 
-      const totalPages = Math.ceil(vinyls.count / pageSize);
+      const totalPages = Math.ceil(vinyls.count.length / pageSize);
 
       return { vinyls: vinyls.rows, totalPages };
     } catch (error) {
