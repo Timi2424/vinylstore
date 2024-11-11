@@ -24,7 +24,7 @@ import { systemLogger } from 'src/utils/logger';
       const message =
         exception instanceof HttpException
           ? exception.getResponse()
-          : 'Internal bibi error';
+          : 'Catched internal server error';
   
       systemLogger.log(
         `HTTP Status: ${status} Error Message: ${JSON.stringify(message)}`,
