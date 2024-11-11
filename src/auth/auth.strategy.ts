@@ -46,7 +46,7 @@ export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
       const user: any = {
         auth0Id: profile.id,
         email: profile.emails[0]?.value,
-        role: profile._json?.['https://your-app.com/roles']?.[0] || 'user',
+        role: profile._json?.['https://vinylapp/roles']?.[0] || 'user',
       };
 
       if (!user.email) {
