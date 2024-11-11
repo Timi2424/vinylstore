@@ -1,9 +1,8 @@
 import { Controller, Get, Delete, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { AdminGuard } from '../auth/admin.guard';
 import { SessionAuthGuard } from '../auth/auth.guard';
-
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -12,6 +11,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @ApiOperation({ summary: 'Get system logs' })
+  @ApiResponse({ status: 200, description: 'System logs retrieved successfully' })
   @Get('logs/system')
   getSystemLogs() {
     try {
@@ -23,6 +23,7 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: 'Get controller logs' })
+  @ApiResponse({ status: 200, description: 'Controller logs retrieved successfully' })
   @Get('logs/controller')
   getControllerLogs() {
     try {
@@ -34,6 +35,7 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: 'Delete system logs' })
+  @ApiResponse({ status: 204, description: 'System logs deleted successfully' })
   @Delete('logs/system')
   deleteSystemLogs() {
     try {
@@ -45,6 +47,7 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: 'Delete controller logs' })
+  @ApiResponse({ status: 204, description: 'Controller logs deleted successfully' })
   @Delete('logs/controller')
   deleteControllerLogs() {
     try {
@@ -55,3 +58,4 @@ export class AdminController {
     }
   }
 }
+

@@ -1,20 +1,29 @@
-import { Optional } from '@nestjs/common';
-import { IsString, IsDecimal } from 'class-validator';
+import { IsString, IsOptional, IsDecimal } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateVinylDto {
+  @ApiProperty({ description: 'Updated name of the vinyl record', required: false })
+  @IsOptional()
   @IsString()
-  @Optional()
-  name: string;
+  name?: string;
 
+  @ApiProperty({ description: 'Updated artist of the vinyl record', required: false })
+  @IsOptional()
   @IsString()
-  @Optional()
-  artist: string;
+  artist?: string;
 
+  @ApiProperty({ description: 'Updated description of the vinyl record', required: false })
+  @IsOptional()
   @IsString()
-  @Optional()
-  description: string;
+  description?: string;
 
-  @IsDecimal()
-  @Optional()
-  price: number;
+  @ApiProperty({ description: 'Updated price of the vinyl record', required: false })
+  @IsOptional()
+  @IsDecimal({ decimal_digits: '0,2' })
+  price?: number;
+
+  @ApiProperty({ description: 'Updated URL of the vinyl image', required: false })
+  @IsOptional()
+  @IsString()
+  image?: string;
 }

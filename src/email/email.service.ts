@@ -21,7 +21,7 @@ export class EmailService {
       debug: true,
     });
 
-    this.transporter.verify((error, success) => {
+    this.transporter.verify((error) => {
       if (error) {
         systemLogger.error('Email service initialization error:', error);
       } else {
@@ -39,11 +39,28 @@ export class EmailService {
     };
 
     try {
-      systemLogger.log(`Sending email to ${user.email}...`);
+      systemLogger.log(`Sending profile update email to ${user.email}...`);
       const info = await this.transporter.sendMail(mailOptions);
-      systemLogger.log(`Email sent: ${info.response}`);
+      systemLogger.log(`Profile update email sent: ${info.response}`);
     } catch (error) {
-      systemLogger.error(`Failed to send email: ${(error as Error).message}`);
+      systemLogger.error(`Failed to send profile update email: ${(error as Error).message}`);
+    }
+  }
+
+  async sendPaymentConfirmation(email: string, amount: number): Promise<void> {
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_USER'),
+      to: email,
+      subject: 'Payment Confirmation',
+      text: `Thank you for your purchase of $${(amount / 100).toFixed(2)}! Your payment has been successfully processed.`,
+    };
+
+    try {
+      systemLogger.log(`Sending payment confirmation email to ${email}...`);
+      const info = await this.transporter.sendMail(mailOptions);
+      systemLogger.log(`Payment confirmation email sent: ${info.response}`);
+    } catch (error) {
+      systemLogger.error(`Failed to send payment confirmation email: ${(error as Error).message}`);
     }
   }
 }

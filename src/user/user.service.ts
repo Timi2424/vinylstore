@@ -4,16 +4,30 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '../model/user.model';
 import { UserType } from '../types/user.type';
 import { systemLogger } from '../utils/logger';
+import { Review } from '../model/review.model';
+import { Vinyl } from '../model/vinyl.model';
 
 @Injectable()
 export class UserService {
-  async findByAuth0Id(auth0Id: string): Promise<UserType> {
-    const user = await User.findOne({ where: { auth0Id } });
-    if (!user) {
-      systemLogger.warn(`User with Auth0 ID ${auth0Id} not found`);
-      throw new NotFoundException(`User with Auth0 ID ${auth0Id} not found`);
+  async findByAuth0Id(auth0Id: string): Promise<User> {
+    try {
+      const user = await User.findOne({
+        where: { auth0Id },
+        include: [
+          { model: Review, as: 'reviews' },
+          { model: Vinyl, as: 'purchasedVinylRecords' }
+        ],
+      });
+
+      if (!user) {
+        systemLogger.warn(`User with Auth0 ID ${auth0Id} not found`);
+        throw new NotFoundException(`User with Auth0 ID ${auth0Id} not found`);
+      }
+      return user;
+    } catch (error) {
+      systemLogger.error(`Error fetching user profile for Auth0 ID ${auth0Id}`, error);
+      throw new InternalServerErrorException('Failed to retrieve user profile');
     }
-    return user.get({ plain: true }) as UserType;
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserType> {

@@ -1,4 +1,6 @@
-export type AuthenticatedRequest = {
-    user?: { id: string; email: string };
-    cookies?: { token: string };
+import { Request } from 'express';
+
+export type AuthenticatedRequest = Request & {
+  user?: { id: string; email: string };
+  cookies?: { token: string };
 };

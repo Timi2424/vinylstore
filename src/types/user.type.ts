@@ -5,5 +5,5 @@ export interface UserType {
   lastName?: string;
   birthdate?: string | Date;
   avatar?: string;
-  role?: 'user' | 'admin';
+  role?: string;
 }

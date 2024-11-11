@@ -1,5 +1,5 @@
 import { Controller, Get, Patch, Delete, Body, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
@@ -10,7 +10,8 @@ import { SessionAuthGuard } from '../auth/auth.guard';
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
-  @ApiOperation({ summary: 'Get user profile' })
+  @ApiOperation({ summary: 'Get authenticated user profile' })
+  @ApiResponse({ status: 200, description: 'User profile including reviews and purchased vinyl records' })
   @UseGuards(SessionAuthGuard)
   @Get('profile')
   async getProfile(@Req() req: Request) {
@@ -24,6 +25,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Update user profile' })
+  @ApiResponse({ status: 200, description: 'User profile updated successfully' })
   @UseGuards(SessionAuthGuard)
   @Patch('profile')
   async updateProfile(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
@@ -37,6 +39,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Delete user profile' })
+  @ApiResponse({ status: 204, description: 'User profile deleted successfully' })
   @UseGuards(SessionAuthGuard)
   @Delete('profile')
   async deleteProfile(@Req() req: Request) {

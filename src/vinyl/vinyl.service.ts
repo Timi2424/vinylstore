@@ -3,6 +3,8 @@ import { CreateVinylDto } from './dto/create-vinyl.dto';
 import { UpdateVinylDto } from './dto/update-vinyl.dto';
 import { Vinyl } from '../model/vinyl.model';
 import { systemLogger } from '../utils/logger';
+import { Review } from '../model/review.model';
+import { Op, Sequelize } from 'sequelize';
 
 @Injectable()
 export class VinylService {
@@ -17,11 +19,46 @@ export class VinylService {
     }
   }
 
-  async findAll(): Promise<Vinyl[]> {
+  async findAll(
+    page: number = 1,
+    pageSize: number = 10,
+    searchName?: string,
+    searchArtist?: string,
+    sortBy: 'price' | 'name' | 'artist' = 'name',
+  ) {
     try {
-      return await Vinyl.findAll({ include: { all: true } });
+      const offset = (page - 1) * pageSize;
+      const where: any = {};
+
+      if (searchName) {
+        where.name = { [Op.iLike]: `%${searchName}%` };
+      }
+      if (searchArtist) {
+        where.artist = { [Op.iLike]: `%${searchArtist}%` };
+      }
+
+      const vinyls = await Vinyl.findAndCountAll({
+        where,
+        include: [
+          {
+            model: Review,
+            attributes: [
+              [Sequelize.fn('AVG', Sequelize.col('rating')), 'averageScore'],
+            ],
+            limit: 1,
+          },
+        ],
+        offset,
+        limit: pageSize,
+        order: [[sortBy, 'ASC']],
+        distinct: true,
+      });
+
+      const totalPages = Math.ceil(vinyls.count / pageSize);
+
+      return { vinyls: vinyls.rows, totalPages };
     } catch (error) {
-      systemLogger.error('Failed to retrieve vinyl records', error);
+      systemLogger.error('Failed to retrieve paginated vinyl records', error);
       throw new InternalServerErrorException('Failed to retrieve vinyl records');
     }
   }
