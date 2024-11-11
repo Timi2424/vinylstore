@@ -21,10 +21,17 @@ export class AuthService {
     }
   }
 
-  async validateUser(token: any) {
-    if (!token || typeof token !== 'string') {
-      systemLogger.warn('Invalid token type or missing token');
-      throw new JsonWebTokenError('JWT must be a string');
+  async validateUser(req: Request) {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || typeof authHeader !== 'string') {
+      systemLogger.warn('Authorization header missing or invalid');
+      throw new Error('Authorization header missing or invalid');
+    }
+  
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      systemLogger.warn('Bearer token missing');
+      throw new Error('Bearer token missing');
     }
   
     try {
@@ -33,7 +40,8 @@ export class AuthService {
       return decoded;
     } catch (error) {
       systemLogger.error(`Token verification error: ${error.message}`, { error });
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+      throw new Error('Invalid token');
     }
   }
+  
 }
