@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VinylService } from './vinyl.service';
 import { Vinyl } from '../model/vinyl.model';
+import { Review } from '../model/review.model';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Op } from 'sequelize';
 
 jest.mock('../model/vinyl.model');
 jest.mock('../utils/logger');
@@ -41,6 +43,12 @@ describe('VinylService', () => {
     expect(result).toEqual(vinyl);
   });
 
+  it('should throw NotFoundException if vinyl to retrieve by id is not found', async () => {
+    jest.spyOn(Vinyl, 'findByPk').mockResolvedValue(null);
+
+    await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
+  });
+
   it('should update a vinyl record', async () => {
     const vinyl = { id: '1', update: jest.fn() } as any;
     jest.spyOn(Vinyl, 'findByPk').mockResolvedValue(vinyl);
@@ -48,6 +56,12 @@ describe('VinylService', () => {
     const updateDto = { name: 'Updated Name' };
     await service.update('1', updateDto);
     expect(vinyl.update).toHaveBeenCalledWith(updateDto);
+  });
+
+  it('should throw NotFoundException if vinyl to update is not found', async () => {
+    jest.spyOn(Vinyl, 'findByPk').mockResolvedValue(null);
+
+    await expect(service.update('1', { name: 'Updated Name' })).rejects.toThrow(NotFoundException);
   });
 
   it('should delete a vinyl record', async () => {
@@ -62,5 +76,44 @@ describe('VinylService', () => {
     jest.spyOn(Vinyl, 'findByPk').mockResolvedValue(null);
 
     await expect(service.remove('1')).rejects.toThrow(NotFoundException);
+  });
+
+  it('should retrieve paginated vinyl records with sorting and filtering', async () => {
+    const vinyls = {
+      rows: [
+        { id: '1', name: 'Vinyl A', artist: 'Artist A', description: 'Description', price: 29.99 } as Vinyl,
+        { id: '2', name: 'Vinyl B', artist: 'Artist B', description: 'Description', price: 19.99 } as Vinyl,
+      ],
+      count: [{ count: 2 }],
+    };
+
+    jest.spyOn(Vinyl, 'findAndCountAll').mockResolvedValue(vinyls as any);
+
+    const result = await service.findAll(1, 10, 'Vinyl', 'Artist', 'price');
+
+    expect(result.vinyls).toEqual(vinyls.rows);
+    expect(result.totalPages).toEqual(1);
+    expect(Vinyl.findAndCountAll).toHaveBeenCalledWith({
+      where: {
+        name: { [Op.iLike]: '%Vinyl%' },
+        artist: { [Op.iLike]: '%Artist%' },
+      },
+      include: [
+        {
+          model: Review,
+          attributes: [[expect.any(Function), 'averageScore']],
+        },
+      ],
+      offset: 0,
+      limit: 10,
+      order: [['price', 'ASC']],
+      distinct: true,
+    });
+  });
+
+  it('should throw InternalServerErrorException when findAll fails', async () => {
+    jest.spyOn(Vinyl, 'findAndCountAll').mockRejectedValue(new Error());
+
+    await expect(service.findAll()).rejects.toThrow(InternalServerErrorException);
   });
 });
