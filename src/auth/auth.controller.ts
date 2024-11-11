@@ -22,52 +22,59 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Auth0 callback' })
-@Get('callback')
-@UseGuards(AuthGuard('auth0'))
-async callback(@Req() req: Request, @Res() res: Response) {
-    try {
-        systemLogger.log('Auth0 callback initiated');
-        
-        const auth0User = req.user as any;
-        if (!auth0User) {
-            systemLogger.error('User information is missing from Auth0');
-            throw new Error("User information is missing from Auth0");
-        }
+  @Get('callback')
+  @UseGuards(AuthGuard('auth0'))
+  async callback(@Req() req: Request, @Res() res: Response) {
+    systemLogger.log('Auth0 callback initiated');
 
-        systemLogger.log(`Auth0 user data received: ${JSON.stringify(auth0User)}`);
-
-        const auth0Id = auth0User.sub;
-        const email = auth0User.email;
-
-        let user = await this.userService.findByAuth0Id(auth0Id);
-        if (!user) {
-            systemLogger.log(`Creating new user for Auth0 ID ${auth0Id}`);
-            user = await this.userService.create({
-                auth0Id,
-                email,
-                firstName: auth0User.given_name,
-                lastName: auth0User.family_name,
-                avatar: auth0User.picture,
-            });
-            systemLogger.log(`Created new user with email ${email}`);
-        } else {
-            systemLogger.log(`User ${email} authenticated via Auth0`);
-        }
-
-        const token = await this.authService.generateJwtToken(user);
-        res.cookie('jwt', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 3600000,
-        });
-
-        systemLogger.log(`JWT token generated and cookie set for ${email}`);
-        res.redirect('/api/auth/callback');
-    } catch (error) {
-        systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
-        throw new HttpException('Callback Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    // Step 1: Verify Auth0 response user data
+    const auth0User = req.user as any;
+    if (!auth0User) {
+      return this.logAndThrowError('User information is missing from Auth0', HttpStatus.UNAUTHORIZED);
     }
-}
+    systemLogger.log(`Auth0 user data received: ${JSON.stringify(auth0User)}`);
+
+    const { sub: auth0Id, email, given_name: firstName, family_name: lastName, picture: avatar } = auth0User;
+
+    // Step 2: Check or create user in the local database
+    let user;
+    try {
+      user = await this.userService.findByAuth0Id(auth0Id);
+      if (!user) {
+        systemLogger.log(`No user found for Auth0 ID ${auth0Id}, creating new user`);
+        user = await this.userService.create({ auth0Id, email, firstName, lastName, avatar });
+        systemLogger.log(`Created new user with email ${email}`);
+      } else {
+        systemLogger.log(`User ${email} authenticated via Auth0`);
+      }
+    } catch (dbError) {
+      return this.logAndThrowError(`Database error: ${dbError.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Step 3: Generate and set JWT token
+    try {
+      const token = await this.authService.generateJwtToken(user);
+      this.setJwtCookie(res, token, email);
+      systemLogger.log(`JWT token generated and cookie set for ${email}`);
+      res.redirect('/api/user/profile');
+    } catch (tokenError) {
+      return this.logAndThrowError(`JWT generation or cookie setting error: ${tokenError.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private setJwtCookie(res: Response, token: string, email: string) {
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3600000,
+    });
+    systemLogger.log(`JWT token cookie set for ${email}`);
+  }
+
+  private logAndThrowError(message: string, status: HttpStatus): never {
+    systemLogger.error(message);
+    throw new HttpException(message, status);
+  }
 
   @ApiOperation({ summary: 'Logout from the system' })
   @Get('logout')
