@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Admin')
 @Controller('admin')
-// @UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 

@@ -8,9 +8,7 @@ import { systemLogger, controllerLogger } from './utils/logger';
 import { JwtService } from '@nestjs/jwt';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, {
-        logger: systemLogger,
-    });
+    const app = await NestFactory.create(AppModule);
 
     app.use((req, res, next) => {
         const start = Date.now();

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { VinylService } from './vinyl.service';
 import { CreateVinylDto } from './dto/create-vinyl.dto';
 import { UpdateVinylDto } from './dto/update-vinyl.dto';
@@ -8,27 +8,52 @@ export class VinylController {
   constructor(private readonly vinylService: VinylService) {}
 
   @Post('create')
-  create(@Body() createVinylDto: CreateVinylDto) {
-    return this.vinylService.create(createVinylDto);
+  async create(@Body() createVinylDto: CreateVinylDto) {
+    try {
+      const vinyl = await this.vinylService.create(createVinylDto);
+      return { statusCode: HttpStatus.CREATED, message: 'Vinyl record created successfully', data: vinyl };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get('all')
-  findAll() {
-    return this.vinylService.findAll();
+  async findAll() {
+    try {
+      const vinyls = await this.vinylService.findAll();
+      return { statusCode: HttpStatus.OK, data: vinyls };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vinylService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const vinyl = await this.vinylService.findOne(id);
+      return { statusCode: HttpStatus.OK, data: vinyl };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVinylDto: UpdateVinylDto) {
-    return this.vinylService.update(id, updateVinylDto);
+  async update(@Param('id') id: string, @Body() updateVinylDto: UpdateVinylDto) {
+    try {
+      const updatedVinyl = await this.vinylService.update(id, updateVinylDto);
+      return { statusCode: HttpStatus.OK, message: 'Vinyl record updated successfully', data: updatedVinyl };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vinylService.remove(id);
+  async remove(@Param('id') id: string) {
+    try {
+      await this.vinylService.remove(id);
+      return { statusCode: HttpStatus.NO_CONTENT, message: 'Vinyl record deleted successfully' };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
