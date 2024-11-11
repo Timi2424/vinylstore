@@ -13,18 +13,13 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
       callbackURL: process.env.AUTH0_CALLBACK_URL,
       state: false,
       scope: 'openid profile email',
+      session: true,
     });
   }
 
   async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any): Promise<any> {
-    try {
-      const user = await this.authService.validateUser(profile);
-      if (!user) {
-        throw new Error('User not found');
-      }
-      return user;
-    } catch (error) {
-      throw error;
-    }
+    const user = await this.authService.validateUser(profile);
+    if (!user) throw new Error('User not found');
+    return user;
   }
 }

@@ -6,6 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { systemLogger, controllerLogger } from './utils/logger';
 import { JwtService } from '@nestjs/jwt';
+import passport from 'passport';
+import session from 'express-session';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -15,6 +17,22 @@ async function bootstrap() {
         const jwtService = app.get(JwtService);
         let userEmail = 'Guest';
 
+        app.use(
+            session({
+                secret: process.env.SESSION_SECRET || 'default_secret',
+                resave: false,
+                saveUninitialized: false,
+                cookie: {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: 3600000,
+                },
+            }),
+        );
+    
+        app.use(passport.initialize());
+        app.use(passport.session());
+        
         if (req.cookies && req.cookies.jwt) {
             try {
                 const decodedToken = jwtService.verify(req.cookies.jwt);
