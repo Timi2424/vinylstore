@@ -22,36 +22,37 @@ export class AuthController {
   @UseGuards(AuthGuard('auth0'))
   async callback(@Req() req: Request, @Res() res: Response) {
     try {
-      const auth0User = req.user as User;
+      const auth0User = req.user as any;
 
-      if (!auth0User) {
+      if (!auth0User || !auth0User.sub || !auth0User.email) {
         systemLogger.error('User information missing in Auth0 callback');
         throw new HttpException('Auth0 user information missing', HttpStatus.INTERNAL_SERVER_ERROR);
       }
 
-      const { auth0Id, email, firstName, lastName, avatar, } = auth0User;
+      const auth0Id = auth0User.sub;
+      const email = auth0User.email;
 
       let user: Partial<UserType> = await this.userService.findByAuth0Id(auth0Id);
-      
       if (!user) {
+        systemLogger.log(`Creating new user for Auth0 ID ${auth0Id}`);
         user = await this.userService.create({
           auth0Id,
           email,
-          firstName,
-          lastName,
-          avatar,
-          role: 'user',
+          firstName: auth0User.given_name || '',
+          lastName: auth0User.family_name || '',
+          avatar: auth0User.picture || '',
         });
-        systemLogger.log(`Created new user with email: ${email}`);
+        systemLogger.log(`New user created with email ${email}`);
       } else {
         systemLogger.log(`User ${email} authenticated via Auth0`);
       }
+      req.session.user = { id: user.id, email: user.email };
+      systemLogger.log(`Session created for user: ${email}`);
 
-      req.session.user = user;
       res.redirect('/api/user/profile');
     } catch (error) {
-      systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
-      throw new HttpException('Callback Error', HttpStatus.INTERNAL_SERVER_ERROR);
+      systemLogger.error(`Auth0 callback error: ${error.message}`);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Callback Error' });
     }
   }
 
