@@ -2,11 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewService } from './review.service';
 import { Review } from '../model/review.model';
 import { NotFoundException,  } from '@nestjs/common';
+import { GroupedCountResultItem } from 'sequelize';
 
 jest.mock('../model/review.model');
 jest.mock('../utils/logger');
-
-type FindAndCountAllResult<T> = { rows: T[]; count: number };
 
 describe('ReviewService', () => {
   let service: ReviewService;
@@ -33,8 +32,8 @@ describe('ReviewService', () => {
 
     jest.spyOn(Review, 'findAndCountAll').mockResolvedValue({
       rows: reviews,
-      count: 1,
-    } as FindAndCountAllResult<Review>);
+      count: 1 as unknown as GroupedCountResultItem[],
+    });
 
     const result = await service.getReviewsByVinylId('1');
     expect(result.reviews).toEqual(reviews);
