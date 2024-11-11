@@ -1,32 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-auth0';
 import { ConfigService } from '@nestjs/config';
-import { UserType } from '../types/user.type';
-import { systemLogger } from 'src/utils/logger';
+import { systemLogger } from '../utils/logger';
 
 @Injectable()
 export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
   constructor(configService: ConfigService) {
-    const domain = configService.get<string>('AUTH0_DOMAIN');
-    const clientID = configService.get<string>('AUTH0_CLIENT_ID');
-    const clientSecret = configService.get<string>('AUTH0_CLIENT_SECRET');
-    const callbackURL = configService.get<string>('AUTH0_CALLBACK_URL');
-    
     super({
-      domain,
-      clientID,
-      clientSecret,
-      callbackURL,
+      domain: configService.get<string>('AUTH0_DOMAIN'),
+      clientID: configService.get<string>('AUTH0_CLIENT_ID'),
+      clientSecret: configService.get<string>('AUTH0_CLIENT_SECRET'),
+      callbackURL: configService.get<string>('AUTH0_CALLBACK_URL'),
       state: false,
-      scope: 'openid profile email',
     });
-
- 
-    systemLogger.log(`Auth0Strategy initialized with:
-      domain: ${domain},
-      clientID: ${clientID},
-      callbackURL: ${callbackURL}`);
   }
 
   async validate(
@@ -36,30 +23,30 @@ export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
     profile: any,
     done: Function,
   ) {
-    systemLogger.log(`Validate function called with:
-      accessToken: ${accessToken ? 'Received' : 'Not received'},
-      refreshToken: ${refreshToken ? 'Received' : 'Not received'},
-      extraParams: ${JSON.stringify(extraParams)}`);
-    
+    systemLogger.log('Validate function called with:');
+    systemLogger.log(`accessToken: ${accessToken ? 'Received' : 'Not received'},`);
+    systemLogger.log(`refreshToken: ${refreshToken ? 'Received' : 'Not received'},`);
+    systemLogger.log(`extraParams: ${JSON.stringify(extraParams)}`);
     systemLogger.log(`Auth0 profile received: ${JSON.stringify(profile)}`);
 
+    if (!profile || !profile.id || !profile.emails || profile.emails.length === 0) {
+      const errorMessage = 'Invalid or incomplete profile data received from Auth0';
+      systemLogger.error(errorMessage);
+      return done(new UnauthorizedException(errorMessage), false);
+    }
+
     try {
-      const user: any = {
+      const user = {
         auth0Id: profile.id,
-        email: profile.emails[0]?.value,
+        email: profile.emails[0]?.value || '',
         role: profile._json?.['https://vinylstore/roles']?.[0] || 'user',
       };
+      systemLogger.log(`Validated user profile: ${JSON.stringify(user)}`);
 
-      if (!user.email) {
-        systemLogger.error('Email not found in Auth0 profile.');
-        throw new Error('Email not found in profile.');
-      }
-
-      systemLogger.log(`Validated user profile for email: ${user.email}`);
-      done(null, user);
-    } catch (err) {
-      systemLogger.error(`Error validating user profile: ${err.message}`);
-      done(err, false);
+      return done(null, user);
+    } catch (error) {
+      systemLogger.error(`Error validating user profile: ${error.message}`);
+      return done(error, false);
     }
   }
 }
