@@ -12,6 +12,11 @@ import { UserType } from 'src/types/user.type';
 export class AuthController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({ summary: 'Login via Auth0' })
+  @Get('login')
+  @UseGuards(AuthGuard('auth0'))
+  login() {
+  }
   @ApiOperation({ summary: 'Auth0 callback' })
   @Get('callback')
   @UseGuards(AuthGuard('auth0'))
@@ -26,7 +31,7 @@ export class AuthController {
 
       const { auth0Id, email, firstName, lastName, avatar, } = auth0User;
 
-      let user: UserType = await this.userService.findByAuth0Id(auth0Id);
+      let user: Partial<UserType> = await this.userService.findByAuth0Id(auth0Id);
       
       if (!user) {
         user = await this.userService.create({
