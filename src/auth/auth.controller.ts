@@ -25,41 +25,50 @@ export class AuthController {
 @Get('callback')
 @UseGuards(AuthGuard('auth0'))
 async callback(@Req() req: Request, @Res() res: Response) {
-  try {
-    const auth0User = req.user as any;
-    if (!auth0User) throw new Error("User information is missing from Auth0");
+    try {
+        systemLogger.log('Auth0 callback initiated');
+        
+        const auth0User = req.user as any;
+        if (!auth0User) {
+            systemLogger.error('User information is missing from Auth0');
+            throw new Error("User information is missing from Auth0");
+        }
 
-    const auth0Id = auth0User.sub;
-    const email = auth0User.email;
+        systemLogger.log(`Auth0 user data received: ${JSON.stringify(auth0User)}`);
 
-    let user = await this.userService.findByAuth0Id(auth0Id);
-    if (!user) {
-      user = await this.userService.create({
-        auth0Id,
-        email,
-        firstName: auth0User.given_name,
-        lastName: auth0User.family_name,
-        avatar: auth0User.picture,
-      });
-      systemLogger.log(`Created new user with email ${email}`);
-    } else {
-      systemLogger.log(`User ${email} authenticated via Auth0`);
+        const auth0Id = auth0User.sub;
+        const email = auth0User.email;
+
+        let user = await this.userService.findByAuth0Id(auth0Id);
+        if (!user) {
+            systemLogger.log(`Creating new user for Auth0 ID ${auth0Id}`);
+            user = await this.userService.create({
+                auth0Id,
+                email,
+                firstName: auth0User.given_name,
+                lastName: auth0User.family_name,
+                avatar: auth0User.picture,
+            });
+            systemLogger.log(`Created new user with email ${email}`);
+        } else {
+            systemLogger.log(`User ${email} authenticated via Auth0`);
+        }
+
+        const token = await this.authService.generateJwtToken(user);
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000,
+        });
+
+        systemLogger.log(`JWT token generated and cookie set for ${email}`);
+        res.redirect('/api/auth/callback');
+    } catch (error) {
+        systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
+        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    const token = await this.authService.generateJwtToken(user);
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 3600000,
-    });
-
-    systemLogger.log(`JWT token generated and cookie set for ${email}`);
-    res.redirect('/api/auth/callback');
-  } catch (error) {
-    systemLogger.error(`Auth0 callback error: ${error.message}`, { error });
-    throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
-  }
 }
+
 
   @ApiOperation({ summary: 'Logout from the system' })
   @Get('logout')
