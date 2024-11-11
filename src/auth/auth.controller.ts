@@ -48,7 +48,7 @@ export class AuthController {
     });
 
     logger.log(`User ${email} logged in`);
-    res.redirect('/api/auth/callback');
+    res.redirect('/api/user/profile');
   }
 
   @ApiOperation({ summary: 'Logout from the system' })
