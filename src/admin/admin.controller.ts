@@ -1,17 +1,16 @@
-import { Controller, Get, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Delete, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { AdminGuard } from '../auth/admin.guard';
 import { JwtAuthGuard } from '../auth/auth.guard';
 
-
 @ApiTags('Admin')
 @Controller('admin')
+// @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @ApiOperation({ summary: 'Get system logs' })
-//   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('logs/system')
   getSystemLogs() {
     try {
@@ -23,7 +22,6 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: 'Get controller logs' })
-//   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('logs/controller')
   getControllerLogs() {
     try {
@@ -31,6 +29,28 @@ export class AdminController {
       return { logs };
     } catch (error) {
       throw new HttpException('Failed to retrieve controller logs', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @ApiOperation({ summary: 'Delete system logs' })
+  @Delete('logs/system')
+  deleteSystemLogs() {
+    try {
+      const message = this.adminService.deleteSystemLogs();
+      return { message };
+    } catch (error) {
+      throw new HttpException('Failed to delete system logs', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @ApiOperation({ summary: 'Delete controller logs' })
+  @Delete('logs/controller')
+  deleteControllerLogs() {
+    try {
+      const message = this.adminService.deleteControllerLogs();
+      return { message };
+    } catch (error) {
+      throw new HttpException('Failed to delete controller logs', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
