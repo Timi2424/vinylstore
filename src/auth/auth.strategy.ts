@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { AuthService } from './auth.service';
-import { Profile } from 'passport';
 import { Strategy } from 'passport-auth0';
+import { AuthService } from './auth.service';
+import { systemLogger } from '../utils/logger';
 
 @Injectable()
 export class Auth0Strategy extends PassportStrategy(Strategy) {
@@ -13,12 +13,18 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       callbackURL: process.env.AUTH0_CALLBACK_URL,
       state: false,
+      scope: 'openid profile email',
       session: true,
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: Profile): Promise<any> {
+  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any): Promise<any> {
     const user = await this.authService.validateUser(profile);
+    systemLogger.log(user);
+    systemLogger.log(user);
+    systemLogger.log(user);
+    systemLogger.log(user);
+    systemLogger.log(user);
     if (!user) throw new Error('User not found');
     return user;
   }
