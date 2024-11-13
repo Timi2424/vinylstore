@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-auth0';
-import { AuthService } from './auth.service';
 import { systemLogger } from '../utils/logger';
 
 @Injectable()
 export class Auth0Strategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor() {
     super({
       domain: process.env.AUTH0_DOMAIN,
       clientID: process.env.AUTH0_CLIENT_ID,
@@ -19,7 +18,7 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any): Promise<any> {
-    const user = await this.authService.validateUser(profile);
+    const user = profile
     systemLogger.log(user);
     systemLogger.log(user);
     systemLogger.log(user);
