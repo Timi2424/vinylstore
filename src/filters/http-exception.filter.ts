@@ -24,7 +24,7 @@ import { systemLogger } from 'src/utils/logger';
       const message =
         exception instanceof HttpException
           ? exception.getResponse()
-          : 'Cought internal server error';
+          : 'Caught internal server error';
   
       systemLogger.log(
         `HTTP Status: ${status} Error Message: ${JSON.stringify(message)}`,
