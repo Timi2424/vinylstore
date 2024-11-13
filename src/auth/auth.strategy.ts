@@ -18,12 +18,8 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any): Promise<any> {
-    const user = profile
-    systemLogger.log(user);
-    systemLogger.log(user);
-    systemLogger.log(user);
-    systemLogger.log(user);
-    systemLogger.log(user);
+    const user = profile()
+    systemLogger.log( profile());
     if (!user) throw new Error('User not found');
     return user;
   }
