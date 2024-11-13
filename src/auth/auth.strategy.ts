@@ -21,6 +21,7 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
     const user = profile()
     systemLogger.log( profile());
     if (!user) throw new Error('User not found');
-    return done(null, profile)
+    done(null, profile)
+    return user;
   }
 }
