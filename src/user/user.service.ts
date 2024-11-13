@@ -34,7 +34,6 @@ export class UserService {
     try {
       const user = await User.create({
         ...createUserDto,
-        birthdate: createUserDto.birthdate ? new Date(createUserDto.birthdate) : null,
       });
       systemLogger.log(`User with Auth0 ID ${user.auth0Id} created`);
       return user.get({ plain: true }) as UserType;
@@ -53,7 +52,6 @@ export class UserService {
     try {
       await user.update({
         ...updateUserDto,
-        birthdate: updateUserDto.birthdate ? new Date(updateUserDto.birthdate) : user.birthdate,
       });
       systemLogger.log(`User with Auth0 ID ${auth0Id} updated`);
       return user.get({ plain: true }) as UserType;

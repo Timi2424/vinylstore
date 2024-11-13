@@ -23,7 +23,7 @@ export class AuthController {
     try {
       const auth0User = req.user as any;
 
-      if (!auth0User || !auth0User.sub || !auth0User.email) {
+      if (!auth0User || !auth0User.sub) {
         systemLogger.error('User information missing in Auth0 callback');
         throw new HttpException('Auth0 user information missing', HttpStatus.INTERNAL_SERVER_ERROR);
       }

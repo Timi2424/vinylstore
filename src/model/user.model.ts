@@ -15,9 +15,6 @@ export class User extends Model<User> {
   @Column(DataType.STRING)
   email: string;
 
-  @Column(DataType.DATE)
-  birthdate: Date;
-
   @Column(DataType.STRING)
   avatar: string;
 

@@ -84,31 +84,36 @@
             "prettier --write"
         ]
     },
-  "jest": {
-    "moduleFileExtensions": [
-        "js",
-        "json",
-        "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.(spec|int-spec)\\.ts$",
-    "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-        "**/*.(t|j)s",
-        "!**/*.module.(t|j)s",
-        "!**/main.(t|j)s", 
-        "!**/environment/*",
-        "!**/*.config.(t|j)s",
-        "!**/*.d.ts",
-        "!**/auth/**",
-        "!**/filters/**",
-        "!**/email/**",
-        "!**/db/**"
-    ],
-    "coverageDirectory": "../coverage",
-    "coverageReporters": ["text", "lcov", "json", "html"],
-    "testEnvironment": "node"
-}
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
+        "rootDir": "src",
+        "testRegex": ".*\\.(spec|int-spec)\\.ts$",
+        "transform": {
+            "^.+\\.(t|j)s$": "ts-jest"
+        },
+        "collectCoverageFrom": [
+            "**/*.(t|j)s",
+            "!**/*.module.(t|j)s",
+            "!**/main.(t|j)s",
+            "!**/environment/*",
+            "!**/*.config.(t|j)s",
+            "!**/*.d.ts",
+            "!**/auth/**",
+            "!**/filters/**",
+            "!**/email/**",
+            "!**/db/**"
+        ],
+        "coverageDirectory": "../coverage",
+        "coverageReporters": [
+            "text",
+            "lcov",
+            "json",
+            "html"
+        ],
+        "testEnvironment": "node"
+    }
 }
