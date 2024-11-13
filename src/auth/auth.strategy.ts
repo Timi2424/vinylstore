@@ -17,10 +17,10 @@ export class Auth0Strategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any): Promise<any> {
+  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any, done: any): Promise<any> {
     const user = profile()
     systemLogger.log( profile());
     if (!user) throw new Error('User not found');
-    return user;
+    return done(null, profile)
   }
 }
