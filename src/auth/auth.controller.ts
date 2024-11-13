@@ -3,7 +3,6 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
-import { User } from '../model/user.model';
 import { systemLogger } from '../utils/logger';
 import { UserType } from 'src/types/user.type';
 
@@ -51,8 +50,8 @@ export class AuthController {
 
       res.redirect('/api/user/profile');
     } catch (error) {
-      systemLogger.error(`Auth0 callback error: ${error.message}`);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Callback Error' });
+      systemLogger.log(`Auth0 callback error: ${error.message}`);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
     }
   }
 
