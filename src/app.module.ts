@@ -7,7 +7,6 @@ import { PaymentModule } from './payment/payment.module';
 import { EmailModule } from './email/email.module';
 import { VinylModule } from './vinyl/vinyl.module';
 import { AdminModule } from './admin/admin.module';
-import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -22,9 +21,6 @@ import { ReviewModule } from './review/review.module';
     EmailModule,
     VinylModule,
     AdminModule,
-    ReviewModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

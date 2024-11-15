@@ -1,19 +1,28 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './auth.strategy';
+import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
-import { SessionSerializer } from './serialization';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    PassportModule.register({session: true}),
-    forwardRef(() => UserModule)
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1d' },
+      }),
+      inject: [ConfigService],
+    }),
+    forwardRef(() => UserModule),
   ],
-  providers: [JwtStrategy, SessionSerializer],
   controllers: [AuthController],
-  exports: [],
+  providers: [JwtStrategy, AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

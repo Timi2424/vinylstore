@@ -16,22 +16,6 @@ async function bootstrap() {
         const start = Date.now();
         const jwtService = app.get(JwtService);
         let userEmail = 'Guest';
-
-        app.use(
-            session({
-                secret: process.env.SESSION_SECRET || 'default_secret',
-                resave: false,
-                saveUninitialized: false,
-                cookie: {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    maxAge: 3600000,
-                },
-            }),
-        );
-    
-        app.use(passport.initialize());
-        app.use(passport.session());
         
         if (req.cookies && req.cookies.jwt) {
             try {
