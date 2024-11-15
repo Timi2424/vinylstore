@@ -1,27 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-auth0';
-import { systemLogger } from '../utils/logger';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import * as jwksRsa from 'jwks-rsa';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class Auth0Strategy extends PassportStrategy(Strategy) {
-  constructor() {
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(private configService: ConfigService) {
     super({
-      domain: process.env.AUTH0_DOMAIN,
-      clientID: process.env.AUTH0_CLIENT_ID,
-      clientSecret: process.env.AUTH0_CLIENT_SECRET,
-      callbackURL: process.env.AUTH0_CALLBACK_URL,
-      state: false,
-      scope: 'openid profile email',
-      session: true,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKeyProvider: jwksRsa.passportJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `https://${configService.get<string>('AUTH0_DOMAIN')}/.well-known/jwks.json`,
+      }),
+      audience: configService.get<string>('AUTH0_AUDIENCE'),
+      issuer: `https://${configService.get<string>('AUTH0_DOMAIN')}/`,
+      algorithms: ['RS256'],
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, extraParams: any, profile: any, done: any): Promise<any> {
-    const user = profile()
-    systemLogger.log( profile());
-    if (!user) throw new Error('User not found');
-    done(null, profile)
-    return user;
+  async validate(payload: any) {
+    return payload;
   }
 }

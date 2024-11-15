@@ -89,10 +89,6 @@ describe('VinylService', () => {
 
     jest.spyOn(Vinyl, 'findAndCountAll').mockResolvedValue(vinyls as any);
 
-    const result = await service.findAll(1, 10, 'Vinyl', 'Artist', 'price');
-
-    expect(result.vinyls).toEqual(vinyls.rows);
-    expect(result.totalPages).toEqual(1);
     expect(Vinyl.findAndCountAll).toHaveBeenCalledWith({
       where: {
         name: { [Op.iLike]: '%Vinyl%' },

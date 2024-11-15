@@ -1,4 +1,13 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, Default, PrimaryKey } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  Default,
+  PrimaryKey,
+} from 'sequelize-typescript';
 import { Vinyl } from './vinyl.model';
 import { User } from './user.model';
 
@@ -26,7 +35,7 @@ export class Review extends Model<Review> {
     type: DataType.STRING,
     allowNull: false,
   })
-  userId: string;
+  auth0Id: string;
 
   @BelongsTo(() => User)
   user: User;

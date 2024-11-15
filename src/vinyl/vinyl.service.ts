@@ -29,45 +29,44 @@ export class VinylService {
     try {
       const offset = (page - 1) * pageSize;
       const where: any = {};
-
+  
       if (searchName) {
         where.name = { [Op.iLike]: `%${searchName}%` };
       }
       if (searchArtist) {
         where.artist = { [Op.iLike]: `%${searchArtist}%` };
       }
-
-      const vinyls = await Vinyl.findAndCountAll({
+  
+      const { count, rows } = await Vinyl.findAndCountAll({
         where,
-        attributes: {
-          include: [
-            [
-              Sequelize.fn('AVG', Sequelize.col('reviews.rating')),
-              'averageScore'
-            ]
-          ]
-        },
         include: [
           {
             model: Review,
             attributes: [],
           },
         ],
-        group: ['Vinyl.id'],
         offset,
         limit: pageSize,
         order: [[sortBy, 'ASC']],
         distinct: true,
       });
-
-      const totalPages = Math.ceil(vinyls.count.length / pageSize);
-
-      return { vinyls: vinyls.rows, totalPages };
+  
+      const totalPages = Math.ceil(count / pageSize);
+  
+      return {
+        data: rows,
+        totalRecords: count,
+        totalPages,
+        currentPage: page,
+        pageSize,
+      };
     } catch (error) {
       systemLogger.error('Failed to retrieve paginated vinyl records', error);
       throw new InternalServerErrorException('Failed to retrieve vinyl records');
     }
   }
+  
+
 
   async findOne(id: string): Promise<Vinyl> {
     const vinyl = await Vinyl.findByPk(id, { include: { all: true } });
