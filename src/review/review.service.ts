@@ -5,9 +5,9 @@ import { systemLogger } from '../utils/logger';
 
 @Injectable()
 export class ReviewService {
-  async createReview(createReviewDto: CreateReviewDto, userId: string): Promise<Review> {
+  async createReview(createReviewDto: CreateReviewDto, auth0Id: string): Promise<Review> {
     try {
-      const review = await Review.create({ ...createReviewDto, userId });
+      const review = await Review.create({ ...createReviewDto, auth0Id });
       systemLogger.log(`Review ${review.id} created for vinyl ${createReviewDto.vinylId}`);
       return review;
     } catch (error) {
