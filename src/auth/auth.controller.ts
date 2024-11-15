@@ -28,12 +28,14 @@ export class AuthController {
   async callback(@Req() req: Request, @Res() res: Response) {
     try {
       systemLogger.log('Auth0 callback initiated');
-      const auth0User = req.user as any;
 
+      const auth0User = req.user as any;
       if (!auth0User) {
         systemLogger.error('User information missing in Auth0 callback');
         throw new HttpException('Auth0 user information missing', HttpStatus.INTERNAL_SERVER_ERROR);
       }
+
+      systemLogger.log(`Auth0 user data received: ${JSON.stringify(auth0User)}`);
 
       const auth0Id = auth0User.sub;
       const email = auth0User.email;
@@ -48,9 +50,18 @@ export class AuthController {
           lastName: auth0User.family_name,
           avatar: auth0User.picture,
         });
+        systemLogger.log(`Created new user with email ${email}`);
+      } else {
+        systemLogger.log(`User ${email} authenticated via Auth0`);
       }
 
       const token = await this.authService.generateJwtToken(user);
+      if (!token) {
+        systemLogger.error('Failed to generate JWT token');
+        throw new HttpException('Token generation failed', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+      systemLogger.log(`Generated JWT token: ${token}`);
+
       res.cookie('jwt', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
